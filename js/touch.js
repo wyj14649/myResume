@@ -1,7 +1,7 @@
 (function () {
     var touch = {};
 
-    //¿ÂÀí»¯º¯Êý
+    //æŸ¯ç†åŒ–å‡½æ•°
     function bind(context, callBack) {
         var outerArg = [].slice.call(arguments, 2);
         return function () {
@@ -11,19 +11,19 @@
         }
     }
 
-    //¼ì²âÊÇ·ñÊÇ»¬¶¯ÊÂ¼þ
+    //æ£€æµ‹æ˜¯å¦æ˜¯æ»‘åŠ¨äº‹ä»¶
     function isSwipe(strX, endX, strY, endY) {
         return Math.abs(endX - strX) > 30 || Math.abs(endY - strY) > 30;
     }
 
-    //¼ì²âµ±Ç°»¬¶¯µÄ·½Ïò
+    //æ£€æµ‹å½“å‰æ»‘åŠ¨çš„æ–¹å‘
     function swipeDirection(strX, endX, strY, endY) {
         return Math.abs(endX - strX) > Math.abs(endY - strY) ? ((endX - strX) > 0 ? "Right" : "Left") : ((endY - strY) > 0 ? "Down" : "Up");
     }
 
-    //¿ªÊ¼±àÐ´ÊÂ¼þµÄÈý²½²Ù×÷:touchStart¡¢touchMove¡¢touchEnd
-    //name:ÎÒÃÇÄ£ÄâµÄÊÂ¼þÀàÐÍ"tap", "swipe", "swipeLeft", "swipeRight", "swipeUp", "swipeDown"
-    //callback:Ã¿Ò»½×¶ÎÎÒÃÇµ¥¶À´¦ÀíµÄÊÂÇé
+    //å¼€å§‹ç¼–å†™äº‹ä»¶çš„ä¸‰æ­¥æ“ä½œ:touchStartã€touchMoveã€touchEnd
+    //name:æˆ‘ä»¬æ¨¡æ‹Ÿçš„äº‹ä»¶ç±»åž‹"tap", "swipe", "swipeLeft", "swipeRight", "swipeUp", "swipeDown"
+    //callback:æ¯ä¸€é˜¶æ®µæˆ‘ä»¬å•ç‹¬å¤„ç†çš„äº‹æƒ…
     function touchStart(e, name, callback) {
         e.preventDefault();
         var touchPoint = e.touches[0];
@@ -47,7 +47,7 @@
         initDefault.call(this, e, name);
     }
 
-    //¸ù¾Ý´«µÝ½øÀ´µÄÊÂ¼þÀàÐÍºÍµ±Ç°ÓÃ»§µÄÐÐÎª½øÐÐ±È½Ï,×îºóÅÐ¶ÏÊÇ·ñ½øÐÐ´¥·¢
+    //æ ¹æ®ä¼ é€’è¿›æ¥çš„äº‹ä»¶ç±»åž‹å’Œå½“å‰ç”¨æˆ·çš„è¡Œä¸ºè¿›è¡Œæ¯”è¾ƒ,æœ€åŽåˆ¤æ–­æ˜¯å¦è¿›è¡Œè§¦å‘
     function checkEvent(e, name, callBack) {
         var isSwipe = this["isSwipe" + name];
         switch (name) {
@@ -67,7 +67,7 @@
         }
     }
 
-    //ÔÚtouchÊÂ¼þ½áÊøºó°ÑÉèÖÃµÄ×Ô¶¨ÒåÊôÐÔÖµ»Ø¹éµ½Ô­Ê¼µÄ×´Ì¬
+    //åœ¨touchäº‹ä»¶ç»“æŸåŽæŠŠè®¾ç½®çš„è‡ªå®šä¹‰å±žæ€§å€¼å›žå½’åˆ°åŽŸå§‹çš„çŠ¶æ€
     function initDefault(e, name) {
         ["strX", "endX", "strY", "endY", "isSwipe"].forEach(function (item) {
             this[item + name] = null;
@@ -75,7 +75,7 @@
     }
 
 
-    //options:{start:function->¿ªÊ¼×öµÄÊÂÇé move:function->»¬¶¯×öµÄÊÂÇé end:function->½áÊø×öµÄÊÂÇé}
+    //options:{start:function->å¼€å§‹åšçš„äº‹æƒ… move:function->æ»‘åŠ¨åšçš„äº‹æƒ… end:function->ç»“æŸåšçš„äº‹æƒ…}
     function init(name) {
         return function (curEle, options) {
             ["start", "move", "end"].forEach(function (item) {
@@ -84,7 +84,7 @@
                 curEle["my" + item + name] = tempFn;
                 curEle.addEventListener("touch" + item, tempFn, false);
             });
-            return this;//->ÎªÁËÊµÏÖÁ´Ê½Ð´·¨
+            return this;//->ä¸ºäº†å®žçŽ°é“¾å¼å†™æ³•
         }
     }
 

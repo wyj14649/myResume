@@ -1,96 +1,115 @@
-var page = document.querySelector(".page");
-var pageList = [].slice.call(document.querySelectorAll(".pageDemo"), 0);
-var winH = document.documentElement.clientHeight;
-var index = 0, count = pageList.length;
+(function () {
+    var winH = document.documentElement.clientHeight;
+    var inner = document.querySelector(".inner"), pageList = [].slice.call(document.querySelectorAll(".inner>div"), 0);
+    var tip = document.querySelector(".tip");
+    var count = pageList.length;
+    var index = 0;
 
-//init style
-pageList.forEach(function (curItem) {
-    curItem.style.height = winH + "px";
-});
-page.style.height = count * winH + "px";
+    //init height
+    inner.style.height = count * winH + "px";
+    pageList.forEach(function (cur) {
+        cur.style.height = winH + "px";
+    });
 
-//init event
-var bodyTouch = {
-    setTran: function (flag) {
-        if (flag) {
-            page.style.webkitTransitionDuration = "0.5s";
-            return;
-        }
-        page.style.webkitTransitionDuration = "0s";
-    },
-    start: function (e) {
-        this["isEnd"] = false;
-        this["changePos"] = 0;
-        this["strTop"] = parseFloat(page.style.top);
-    },
-    moveUp: function (e) {
-        if (index >= (count - 1)) {
-            return;
-        }
-        var changePos = this["endYswipeUp"] - this["strYswipeUp"];
-        this["changePos"] = changePos;
-        page.style.top = this["strTop"] + changePos + "px";
-    },
-    endUp: function (e) {
-        bodyTouch.setTran(true);
-        if (Math.abs(this["changePos"]) >= (winH / 4)) {
-            index++;
-        }
-        page.style.top = -index * winH + "px";
-        window.setTimeout(function () {
-            bodyTouch.setTran(false);
-            move();
-        }, 500);
-    },
-    moveDown: function (e) {
-        if (index <= 0) {
-            return;
-        }
-        var changePos = this["endYswipeUp"] - this["strYswipeUp"];
-        this["changePos"] = changePos;
-        page.style.top = this["strTop"] + changePos + "px";
-    },
-    endDown: function (e) {
-        bodyTouch.setTran(true);
-        if (Math.abs(this["changePos"]) >= (winH / 4)) {
-            index--;
-        }
-        page.style.top = -index * winH + "px";
-        window.setTimeout(function () {
-            bodyTouch.setTran(false);
-            move();
-        }, 500);
-    }
-};
 
-var body = document.body;
-$t.swipeUp(body, {
-    start: bodyTouch.start,
-    move: bodyTouch.moveUp,
-    end: bodyTouch.endUp
-}).swipeDown(body, {
-    start: bodyTouch.start,
-    move: bodyTouch.moveDown,
-    end: bodyTouch.endDown
-});
+    //init swipe
+    var body = document.body;
+    $t.swipeUp(body, {
+        start: function (e) {
+            this["isEnd"] = false;
+            this["changePos"] = 0;
+            this["strTop"] = parseFloat(inner.style.top);
+        },
+        move: function (e) {
+            if (index >= (count - 1)) {
+                this["isEnd"] = true;
+                return;
+            }
+            var changePos = this["endYswipeUp"] - this["strYswipeUp"];
+            this["changePos"] = changePos;
+            inner.style.top = this["strTop"] + changePos + "px";
+        },
+        end: function (e) {
+            if (this["isEnd"]) {
+                return;
+            }
+            setTran(true);
+            var changePos = this["changePos"];
+            if (Math.abs(changePos) / winH >= 0.25) {
+                //->超过了四分之一的屏幕
+                index++;
+                tip.style.display = index >= (count - 1) ? "none" : "block";
+            }
+            inner.style.top = -index * winH + "px";
 
-//init move
-function move() {
-    pageList.forEach(function (item, i) {
-        if (i === index) {
-            item.className = "pageDemo move";
-        } else {
-            item.className = "pageDemo";
+            //清除设置的值
+            window.setTimeout(function () {
+                setTran(false);
+                pageList.forEach(function (cur, i) {
+                    cur.className = i === index ? "move" : null;
+                });
+            }, 500);
         }
     });
-    document.querySelector(".tip").style.display = index >= (count - 1) ? "none" : "block";
-}
 
-//init music
+    $t.swipeDown(body, {
+        start: function (e) {
+            this["isEnd"] = false;
+            this["changePos"] = 0;
+            this["strTop"] = parseFloat(inner.style.top);
+        },
+        move: function (e) {
+            if (index <= 0) {
+                this["isEnd"] = true;
+                return;
+            }
+            var changePos = this["endYswipeDown"] - this["strYswipeDown"];
+            this["changePos"] = changePos;
+            inner.style.top = this["strTop"] + changePos + "px";
+        },
+        end: function (e) {
+            if (this["isEnd"]) {
+                return;
+            }
+            setTran(true);
+            var changePos = this["changePos"];
+            if (Math.abs(changePos) / winH >= 0.25) {
+                //->超过了四分之一的屏幕
+                index--;
+                tip.style.display = index >= (count - 1) ? "none" : "block";
+            }
+            inner.style.top = -index * winH + "px";
+
+            //清除设置的值
+            window.setTimeout(function () {
+                setTran(false);
+                pageList.forEach(function (cur, i) {
+                    cur.className = i === index ? "move" : null;
+                });
+            }, 500);
+        }
+    });
+
+    function setTran(flag) {
+        if (flag) {
+            inner.style.webkitTransitionDuration = "0.5s";
+            return;
+        }
+        inner.style.webkitTransitionDuration = "0s";
+    }
+
+    window.setTimeout(function () {
+        pageList[0].className = "move";
+    }, 500);
+})();
+
 window.addEventListener("load", function () {
-    var musicAudio = document.querySelector("#musicAudio");
+    //init music
     var music = document.querySelector(".music");
+    var musicAudio = music.querySelector("audio");
 
+    //canplay:音频资源文件已经加载一部分,可以播放了
+    //canplaythrough:音频文件已经全部加载完成,播放不会出现卡顿
     musicAudio.addEventListener("canplay", function () {
         music.style.display = "block";
         music.className = "music move";
@@ -98,34 +117,17 @@ window.addEventListener("load", function () {
     musicAudio.play();
 
     $t.tap(music, {
-        end: function (e) {
+        end: function () {
             if (musicAudio.paused) {
                 musicAudio.play();
-                this.className = "music move";
+                music.className = "music move";
                 return;
             }
             musicAudio.pause();
-            this.className = "music";
+            music.className = "music";
         }
     });
 }, false);
-
-//init on-page
-window.setTimeout(function () {
-    pageList[0].className = "pageDemo move";
-}, 0);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
